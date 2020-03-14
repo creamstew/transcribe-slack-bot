@@ -1,0 +1,89 @@
+service: transcribe-serverless
+frameworkVersion: ">= 1.61.3 < 2.0.0"
+
+plugins:
+  - serverless-s3-remover
+
+custom:
+  remover:
+     buckets:
+       - ${file(./config/setting.yml):input_s3_bucket_name}
+       - ${file(./config/setting.yml):output_s3_bucket_name}
+
+provider:
+  name: aws
+  runtime: ruby2.5
+  timeout: 300
+  region: ${file(./config/setting.yml):aws_region}
+  profile: default
+  stage: dev
+  endpointType: REGIONAL
+  environment:
+    GEM_PATH: $LAMBDA_TASK_ROOT/vendor/bundle/ruby/2.5.0:/opt/ruby/gems/2.5.0:/opt/ruby/2.5.0
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - s3:*
+    Resource:
+      - arn:aws:s3:::${file(./config/setting.yml):input_s3_bucket_name}/*
+      - arn:aws:s3:::${file(./config/setting.yml):output_s3_bucket_name}/*
+  - Effect: Allow
+    Action:
+      - transcribe:*
+    Resource: "*"
+
+package:
+ exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/**
+  - vendor/**
+
+layers:
+  gems:
+    path: vendor/bundle
+    compatibleRuntimes:
+      - ruby2.5
+
+functions:
+  transcribe:
+    handler: src/transcribe.start_job
+    layers:
+      - {Ref: GemsLambdaLayer}
+    environment:
+      REGION: ${file(./config/setting.yml):aws_region}
+      OUTPUT_BACKET: ${file(./config/setting.yml):output_s3_bucket_name}
+    events:
+      - s3:
+          bucket: ${file(./config/setting.yml):input_s3_bucket_name}
+          events:
+            - "s3:ObjectCreated:*"
+  output:
+    handler: src/output.post_slack
+    layers:
+      - {Ref: GemsLambdaLayer}
+    environment:
+      REGION: ${file(./config/setting.yml):aws_region}
+      SLACK_OAUTH_TOKEN: ${file(./config/setting.yml):slack_oauth_token}
+      SLACK_CHANNEL: ${file(./config/setting.yml):slack_channel}
+    events:
+      - s3:
+          bucket: ${file(./config/setting.yml):output_s3_bucket_name}
+          events:
+            - "s3:ObjectCreated:*"
+          rules:
+            - suffix: .json
+  input:
+    handler: src/input.put_s3
+    layers:
+      - {Ref: GemsLambdaLayer}
+    environment:
+      INPUT_BACKET: ${file(./config/setting.yml):input_s3_bucket_name}
+      REGION: ${file(./config/setting.yml):aws_region}
+      SLACK_OAUTH_TOKEN: ${file(./config/setting.yml):slack_oauth_token}
+    events:
+      - http:
+          path: transcribe
+          method: post
+          integration: lambda-proxy
+          cors: true

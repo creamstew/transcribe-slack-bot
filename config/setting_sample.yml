@@ -1,0 +1,5 @@
+input_s3_bucket_name: "xxxxxxxxxxxxxx"
+output_s3_bucket_name: "xxxxxxxxxxxxxx"
+aws_region: "xxxxxxxxxxxxxx"
+slack_oauth_token: "xxxxxxxxxxxxxx"
+slack_channel: "xxxxxxxxxxxxxx"
