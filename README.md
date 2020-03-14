@@ -1,8 +1,18 @@
 # transcribe-slack-bot
  - Slackに投稿された音声データを自動で文字起こししてテキストで返すbot
  - 概要は [Qiita](https://qiita.com/bSRATulen2N90kL/items/f061a6a1a604dfbf989d) に記載しています
+ 
+ <img width="1306" alt="image" src="https://user-images.githubusercontent.com/41504352/76675207-575a8180-65fa-11ea-9ba2-7ba3ec7e27f8.png">
 
 ## 構成
+
+![system](https://user-images.githubusercontent.com/41504352/76675220-71945f80-65fa-11ea-86fb-cd268c28524b.png)
+
+1. Slack API がチャンネルへの投稿を検知して、API Gatewayにその情報を渡す
+2. API Gateway をトリガーに Lambda が起動し、音声ファイルを S3 に保管する
+3. S3 をトリガーに Lambda が起動し、保管した音声ファイルを AWS Transcribe で文字起こしする
+4. 文字起こしされた情報が JSON ファイルとしてS3 に保管される
+5. 保管された JSON ファイルをトリガーに Lambda が起動し、 JSON ファイルから文字起こしされた情報のみをテキストファイル化して、Slack に投稿
 
 ## 準備
  - AWSアカウント
