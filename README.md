@@ -80,4 +80,4 @@ $ serverless deploy
 ### 注意点
 
  - AWSのサービスを使用するため料金がかかります。ご使用は自己責任でお願いします。
- - 文字起こしの価格等は(公式サイト)[https://aws.amazon.com/jp/transcribe/]をご覧ください。
+ - 文字起こしの価格等は[公式サイト](https://aws.amazon.com/jp/transcribe/)をご覧ください。
