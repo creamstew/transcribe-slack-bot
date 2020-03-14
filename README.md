@@ -53,6 +53,7 @@ $ cp config/setting_sample.yml config/setting.yml
 | `aws_region` | AWS リージョン（例：ap-northeast-1） |
 | `slack_oauth_token` | Bot User OAuth Access Token の値 |
 | `slack_channel` | 文字起こししたテキストを投稿するSlackChannel の値（例：#transcribe） |
+
 ※ S3のバケットネームが既に誰かが使用している名前だとデプロイ時にエラーとなります。
 
 ```bash
