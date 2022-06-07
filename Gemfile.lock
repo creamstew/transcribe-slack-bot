@@ -35,7 +35,7 @@ GEM
     hashie (4.1.0)
     i18n (1.8.2)
       concurrent-ruby (~> 1.0)
-    jmespath (1.4.0)
+    jmespath (1.6.1)
     minitest (5.14.0)
     multipart-post (2.1.1)
     slack-ruby-client (0.14.5)
